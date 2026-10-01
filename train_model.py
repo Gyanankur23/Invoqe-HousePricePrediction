@@ -49,35 +49,18 @@ def preprocess_data(df):
     return X_train_scaled, X_test_scaled, y_train, y_test, X.columns
 
 def train_models(X_train, y_train):
-    """Train multiple models and compare them"""
+    """Train a single fast model for deployment"""
     print("\n" + "=" * 50)
     print("MODEL TRAINING")
     print("=" * 50)
     
-    models = {
-        'Linear Regression': LinearRegression(),
-        'Ridge Regression': Ridge(alpha=1.0),
-        'Lasso Regression': Lasso(alpha=1.0),
-        'Random Forest': RandomForestRegressor(n_estimators=100, random_state=42),
-        'Gradient Boosting': GradientBoostingRegressor(n_estimators=100, random_state=42)
-    }
+    # Use only Random Forest for speed in deployment
+    print("Training Random Forest Regressor...")
+    model = RandomForestRegressor(n_estimators=50, random_state=42, n_jobs=-1)
+    model.fit(X_train, y_train)
+    print("Model trained successfully")
     
-    results = {}
-    
-    for name, model in models.items():
-        print(f"\nTraining {name}...")
-        
-        # Cross-validation
-        cv_scores = cross_val_score(model, X_train, y_train, cv=5, scoring='r2')
-        print(f"Cross-validation R2 scores: {cv_scores}")
-        print(f"Mean CV R2: {cv_scores.mean():.4f} (+/- {cv_scores.std() * 2:.4f})")
-        
-        # Fit model
-        model.fit(X_train, y_train)
-        
-        results[name] = model
-    
-    return results
+    return {'Random Forest': model}
 
 def evaluate_models(models, X_test, y_test):
     """Evaluate models on test set"""
