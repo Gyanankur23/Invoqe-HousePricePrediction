@@ -28,8 +28,8 @@ def load_model():
         st.warning("Model not found. Training model now... This may take a moment.")
         try:
             # Download data
-            from data.download_data import download_california_housing
-            download_california_housing()
+            from data.download_data import download_dataset
+            download_dataset()
             
             # Train model
             from train_model import main as train_main
