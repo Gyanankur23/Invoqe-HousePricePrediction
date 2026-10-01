@@ -7,7 +7,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from sklearn.datasets import fetch_california_housing
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import StandardScaler
 import joblib
 import os
@@ -36,11 +36,11 @@ def load_model():
             X = pd.DataFrame(housing.data, columns=housing.feature_names)
             y = housing.target
             
-            # Train a simple model
+            # Train a very simple Linear Regression (instant)
             scaler = StandardScaler()
             X_scaled = scaler.fit_transform(X)
             
-            model = RandomForestRegressor(n_estimators=50, random_state=42, n_jobs=-1)
+            model = LinearRegression()
             model.fit(X_scaled, y)
             
             # Save model
@@ -52,6 +52,8 @@ def load_model():
             return model, scaler, housing.feature_names
         except Exception as e:
             st.error(f"Error: {str(e)}")
+            import traceback
+            st.error(traceback.format_exc())
             return None, None, None
 
 model, scaler, feature_names = load_model()
