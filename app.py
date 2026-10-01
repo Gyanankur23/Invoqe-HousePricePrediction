@@ -17,17 +17,32 @@ st.title("🏠 California House Price Prediction")
 st.markdown("Predict median house values in California districts using Machine Learning")
 
 # Load model and scaler
-@st.cache_resource
 def load_model():
-    """Load the trained model and scaler"""
+    """Load the trained model and scaler, or train if not found"""
     try:
         model = joblib.load('models/best_model.pkl')
         scaler = joblib.load('models/scaler.pkl')
         feature_names = joblib.load('models/feature_names.pkl')
         return model, scaler, feature_names
     except:
-        st.error("Model files not found. Please run train_model.py first.")
-        return None, None, None
+        st.warning("Model not found. Training model now... This may take a moment.")
+        try:
+            # Download data
+            from data.download_data import download_california_housing
+            download_california_housing()
+            
+            # Train model
+            from train_model import main as train_main
+            train_main()
+            
+            # Load the newly trained model
+            model = joblib.load('models/best_model.pkl')
+            scaler = joblib.load('models/scaler.pkl')
+            feature_names = joblib.load('models/feature_names.pkl')
+            return model, scaler, feature_names
+        except Exception as e:
+            st.error(f"Error training model: {str(e)}")
+            return None, None, None
 
 model, scaler, feature_names = load_model()
 
