@@ -1,5 +1,8 @@
 # Task 1: Machine Learning Prediction System - House Price Prediction
 
+## Live Demo
+🚀 **Try the live application:** [https://invoqe-housepriceprediction-dvwc5kgl2jnp7dr2nmxm6q.streamlit.app/](https://invoqe-housepriceprediction-dvwc5kgl2jnp7dr2nmxm6q.streamlit.app/)
+
 ## Overview
 This project implements a machine learning system to predict house prices in California using the California Housing Dataset. It includes data preprocessing, exploratory data analysis, model training with multiple algorithms, and an interactive Streamlit interface for predictions.
 
