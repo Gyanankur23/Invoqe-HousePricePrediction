@@ -6,6 +6,9 @@ Interactive interface for predicting house prices
 import streamlit as st
 import pandas as pd
 import numpy as np
+from sklearn.datasets import fetch_california_housing
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.preprocessing import StandardScaler
 import joblib
 import os
 
@@ -17,31 +20,38 @@ st.title("🏠 California House Price Prediction")
 st.markdown("Predict median house values in California districts using Machine Learning")
 
 # Load model and scaler
+@st.cache_resource
 def load_model():
-    """Load the trained model and scaler, or train if not found"""
+    """Load or train the model"""
     try:
         model = joblib.load('models/best_model.pkl')
         scaler = joblib.load('models/scaler.pkl')
         feature_names = joblib.load('models/feature_names.pkl')
         return model, scaler, feature_names
     except:
-        st.warning("Model not found. Training model now... This may take a moment.")
+        st.warning("Training model on California Housing dataset...")
         try:
-            # Download data
-            from data.download_data import download_dataset
-            download_dataset()
+            # Load data directly from sklearn
+            housing = fetch_california_housing()
+            X = pd.DataFrame(housing.data, columns=housing.feature_names)
+            y = housing.target
             
-            # Train model
-            from train_model import main as train_main
-            train_main()
+            # Train a simple model
+            scaler = StandardScaler()
+            X_scaled = scaler.fit_transform(X)
             
-            # Load the newly trained model
-            model = joblib.load('models/best_model.pkl')
-            scaler = joblib.load('models/scaler.pkl')
-            feature_names = joblib.load('models/feature_names.pkl')
-            return model, scaler, feature_names
+            model = RandomForestRegressor(n_estimators=50, random_state=42, n_jobs=-1)
+            model.fit(X_scaled, y)
+            
+            # Save model
+            os.makedirs('models', exist_ok=True)
+            joblib.dump(model, 'models/best_model.pkl')
+            joblib.dump(scaler, 'models/scaler.pkl')
+            joblib.dump(housing.feature_names, 'models/feature_names.pkl')
+            
+            return model, scaler, housing.feature_names
         except Exception as e:
-            st.error(f"Error training model: {str(e)}")
+            st.error(f"Error: {str(e)}")
             return None, None, None
 
 model, scaler, feature_names = load_model()
