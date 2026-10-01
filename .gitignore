@@ -11,9 +11,8 @@ env/
 *.pkl
 *.h5
 *.csv
-*.png
-*.jpg
-*.jpeg
+# Allow plots/*.png
+!plots/*.png
 
 # IDE
 .vscode/
